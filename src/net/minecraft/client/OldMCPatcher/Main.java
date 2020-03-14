@@ -34,7 +34,7 @@ public class Main extends Frame {
                 final Enumeration<JarEntry> entries = jar.entries();
                 while(entries.hasMoreElements()) {
                     final String name = entries.nextElement().getName();
-                    if (name.startsWith("META-INF/")) {
+                    if (name.startsWith("META-INF/")&&(name.endsWith(".DF")&&name.endsWith(".SF")&&name.endsWith(".MF")&&name.endsWith(".DSA"))) {
                         JOptionPane.showMessageDialog(null, "Please delete META-INF!", "Minecraft", JOptionPane.ERROR_MESSAGE);
                         throw new IllegalStateException("Please delete META-INF!");
                     }
