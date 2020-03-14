@@ -4,6 +4,7 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -29,10 +30,10 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
     @Override
     public void run() {
         try {
-            Class mc = getClass().getClassLoader().loadClass("net.minecraft.client.Minecraft");
+            ArrayList<Field> mcFields = getAllDeclaredFields(this.minecraft.getClass());
             while (run) {
                 //playersList
-                for (Field fi : mc.getDeclaredFields()) {
+                for (Field fi : mcFields) {
                     try {
                         fi.setAccessible(true);
                         Object theWorld;
@@ -112,7 +113,7 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                         this.loaded.add(uuid);
                                                                     }
                                                                 }
-                                                                System.out.println("Setting skin of " + userName);
+                                                                System.out.println("Setting skin of " + userName+"("+uuid+")");
                                                                 skinField.set(player, "/mob/" + uuid + ".png");
                                                             }
                                                         }
