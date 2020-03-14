@@ -25,6 +25,13 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
         this.minecraft = mc;
         this.loaded = new ArrayList<>();
         this.uuidMap = new HashMap<>();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                for (File f : Objects.requireNonNull(new File("resources/skin/").listFiles())) {
+                    f.delete();
+                }
+            }catch (Exception ignore) {}
+        }));
     }
 
     @Override
