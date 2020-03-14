@@ -6,6 +6,7 @@ import java.applet.Applet;
 import java.applet.AppletStub;
 import java.awt.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -40,31 +41,29 @@ public class Launcher extends Applet implements AppletStub {
                     }
                     if(mcf!=null) {
                         mcf.setAccessible(true);
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                super.run();
-                                try {
-                                    Object mc = null;
-                                    while(mc==null) {
-                                        mcf.setAccessible(true);
-                                        mc = mcf.get(applet);
-                                        Thread.sleep(10);
-                                    }
-                                    threadEntityPlayerSkinChanger = new ThreadEntityPlayerSkinChanger(mc);
-                                    threadEntityPlayerSkinChanger.start();
-                                    Runtime.getRuntime().addShutdownHook(new Thread() {
-                                        @Override
-                                        public void run() {
-                                            super.run();
-                                            threadEntityPlayerSkinChanger.Stop();
-                                        }
-                                    });
-                                } catch (Exception e) {
-                                    e.printStackTrace();
+                        new Thread(() -> {
+                            super.run();
+                            try {
+                                Object mc = null;
+                                while(mc==null) {
+                                    mcf.setAccessible(true);
+                                    mc = mcf.get(applet);
+                                    Thread.sleep(10);
                                 }
+                                System.out.println(mc.getClass());
+                                threadEntityPlayerSkinChanger = new ThreadEntityPlayerSkinChanger(mc);
+                                threadEntityPlayerSkinChanger.start();
+                                Runtime.getRuntime().addShutdownHook(new Thread() {
+                                    @Override
+                                    public void run() {
+                                        super.run();
+                                        threadEntityPlayerSkinChanger.Stop();
+                                    }
+                                });
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                        }.start();
+                        }).start();
                     }
                     active = true;
                     applet.start();
