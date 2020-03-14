@@ -20,7 +20,7 @@ public class Main extends Frame {
     public static String assetsDir;
 
     public static void main(String[] args) {
-        System.out.println("OldMCPatcher 1.1.0 https://github.com/kusaanko/OldMCPatcher/releases");
+        System.out.println("OldMCPatcher 1.1.1 https://github.com/kusaanko/OldMCPatcher/releases");
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if (arg.equals("--assetsDir")) {
