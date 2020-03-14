@@ -50,7 +50,6 @@ public class Launcher extends Applet implements AppletStub {
                                     mc = mcf.get(applet);
                                     Thread.sleep(10);
                                 }
-                                System.out.println(mc.getClass());
                                 threadEntityPlayerSkinChanger = new ThreadEntityPlayerSkinChanger(mc);
                                 threadEntityPlayerSkinChanger.start();
                                 Runtime.getRuntime().addShutdownHook(new Thread() {
