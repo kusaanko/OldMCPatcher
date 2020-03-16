@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
@@ -25,6 +26,7 @@ public class Main extends Frame {
     private static Launcher launcher;
     public static String assetsDir;
     public static boolean registerTexture = false;
+    public static ArrayList<String> loadTexture = new ArrayList<>();
 
     public static void main(String[] args) {
         System.out.println("OldMCPatcher 1.1.1 https://github.com/kusaanko/OldMCPatcher/releases");
