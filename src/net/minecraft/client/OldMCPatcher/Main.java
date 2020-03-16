@@ -27,6 +27,7 @@ public class Main extends Frame {
     public static String assetsDir;
     public static boolean registerTexture = false;
     public static ArrayList<String> loadTexture = new ArrayList<>();
+    public static Object renderEngine;
 
     public static void main(String[] args) {
         System.out.println("OldMCPatcher 1.1.1 https://github.com/kusaanko/OldMCPatcher/releases");
