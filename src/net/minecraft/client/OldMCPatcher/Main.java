@@ -56,9 +56,10 @@ public class Main extends Frame {
                                 if(enu.toString().equals("CLIENT")) sideClient = (Enum) enu;
                             }
                             defineClass(loader, "net.minecraft.client.OldMCPatcher.OldMCPatcherTickEvent", "/net/minecraft/client/OldMCPatcher/OldMCPatcherTickEvent.class");
+                            defineClass(loader, "net.minecraft.client.OldMCPatcher.ReflectionHelper", "/net/minecraft/client/OldMCPatcher/ReflectionHelper.class");
                             if(sideClient!=null) {
                                 registerTickHandler.invoke(null,
-                                        loader.loadClass(OldMCPatcherTickEvent.class.getName()).newInstance(),
+                                        loader.loadClass(OldMCPatcherTickEvent.class.getName()).getConstructor(Class.class).newInstance(Main.class),
                                         sideClient);
                             }
                         }catch (ClassNotFoundException ignore){}
