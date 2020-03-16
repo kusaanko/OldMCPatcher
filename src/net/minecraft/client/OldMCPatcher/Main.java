@@ -25,15 +25,16 @@ import static net.minecraft.client.OldMCPatcher.ReflectionHelper.*;
 public class Main extends Frame {
     private static Launcher launcher;
     public static String assetsDir;
-    public static boolean registerTexture = false;
+    public static boolean needRegisterTexture = false;
     public static ArrayList<String> loadTexture = new ArrayList<>();
     public static Object renderEngine;
+    public static Method registerTexture;
 
     public static void main(String[] args) {
         System.out.println("OldMCPatcher 1.1.1 https://github.com/kusaanko/OldMCPatcher/releases");
         try {
             Main.class.getClassLoader().loadClass("cpw.mods.fml.common.ITickHandler");
-            registerTexture = true;
+            needRegisterTexture = true;
             new Thread(() -> {
                 AtomicBoolean run = new AtomicBoolean(true);
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
