@@ -26,7 +26,7 @@ public class Main extends Frame {
     private static Launcher launcher;
     public static String assetsDir;
     public static boolean needRegisterTexture = false;
-    public static ArrayList<String> loadTexture = new ArrayList<>();
+    public static String loadTexture;
     public static Object renderEngine;
     public static Method registerTexture;
 
