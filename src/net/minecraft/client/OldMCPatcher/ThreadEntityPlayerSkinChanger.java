@@ -5,6 +5,7 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.*;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,7 +30,9 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 for (File f : Objects.requireNonNull(new File("resources/skin/").listFiles())) {
-                    f.delete();
+                    try {
+                        Files.delete(f.toPath());
+                    }catch (Exception ignore) {}
                 }
             }catch (Exception ignore) {}
         }));
