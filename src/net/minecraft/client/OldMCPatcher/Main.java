@@ -80,7 +80,7 @@ public class Main extends Frame {
             }).start();
         } catch (ClassNotFoundException ignore) {
             try {
-                defineClass(Main.class.getClassLoader(), "cpw.mods.fml.common.ITickHandler", "net/minecraft/client/OldMCPatcher/ITickHandler.class");
+                defineClass(Main.class.getClassLoader(), "cpw.mods.fml.common.ITickHandler", "net/minecraft/client/OldMCPatcher/ITickHandler.bytecode");
             } catch (NoSuchMethodException | IOException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
