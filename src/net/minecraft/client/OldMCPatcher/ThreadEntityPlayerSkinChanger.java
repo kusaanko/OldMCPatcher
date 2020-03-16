@@ -134,12 +134,12 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                             Main.loadTexture = "/mob/" + uuid + ".png";
                                                                         }
                                                                         this.loaded.add(uuid);
+                                                                        while(Main.loadTexture!=null) {
+                                                                            try {
+                                                                                Thread.sleep(10);
+                                                                            }catch (Exception ignore) {}
+                                                                        }
                                                                     }
-                                                                }
-                                                                while(Main.loadTexture!=null) {
-                                                                    try {
-                                                                        Thread.sleep(10);
-                                                                    }catch (Exception ignore) {}
                                                                 }
                                                                 System.out.println("Setting skin of " + userName + "(" + uuid + ")");
                                                                 skinField.set(player, "/mob/" + uuid + ".png");
