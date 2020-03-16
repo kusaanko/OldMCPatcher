@@ -34,7 +34,6 @@ public class Main extends Frame {
         System.out.println("OldMCPatcher 1.1.1 https://github.com/kusaanko/OldMCPatcher/releases");
         try {
             Main.class.getClassLoader().loadClass("cpw.mods.fml.common.ITickHandler");
-            needRegisterTexture = true;
             new Thread(() -> {
                 AtomicBoolean run = new AtomicBoolean(true);
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -61,6 +60,7 @@ public class Main extends Frame {
                                 registerTickHandler.invoke(null,
                                         loader.loadClass(OldMCPatcherTickEvent.class.getName()).getConstructor(Class.class).newInstance(Main.class),
                                         sideClient);
+                                needRegisterTexture = true;
                             }
                         }catch (ClassNotFoundException ignore){}
                         catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IOException | InstantiationException e) {
