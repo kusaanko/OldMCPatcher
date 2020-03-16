@@ -48,13 +48,7 @@ public class Launcher extends Applet implements AppletStub {
 
                                 threadEntityPlayerSkinChanger = new ThreadEntityPlayerSkinChanger(mc);
                                 threadEntityPlayerSkinChanger.start();
-                                Runtime.getRuntime().addShutdownHook(new Thread() {
-                                    @Override
-                                    public void run() {
-                                        super.run();
-                                        threadEntityPlayerSkinChanger.Stop();
-                                    }
-                                });
+                                Runtime.getRuntime().addShutdownHook(new Thread(() -> threadEntityPlayerSkinChanger.Stop()));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
