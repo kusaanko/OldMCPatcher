@@ -1,12 +1,12 @@
 package net.minecraft;
 
+import net.minecraft.client.OldMCPatcher.ReflectionHelper;
 import net.minecraft.client.OldMCPatcher.ThreadEntityPlayerSkinChanger;
 
 import java.applet.Applet;
 import java.applet.AppletStub;
 import java.awt.*;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -44,12 +44,8 @@ public class Launcher extends Applet implements AppletStub {
                         new Thread(() -> {
                             super.run();
                             try {
-                                Object mc = null;
-                                while(mc==null) {
-                                    mcf.setAccessible(true);
-                                    mc = mcf.get(applet);
-                                    Thread.sleep(10);
-                                }
+                                Object mc = ReflectionHelper.waitAndGet(mcf, applet);
+
                                 threadEntityPlayerSkinChanger = new ThreadEntityPlayerSkinChanger(mc);
                                 threadEntityPlayerSkinChanger.start();
                                 Runtime.getRuntime().addShutdownHook(new Thread() {
