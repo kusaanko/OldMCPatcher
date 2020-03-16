@@ -10,17 +10,76 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URLClassLoader;
 import java.util.Enumeration;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import static net.minecraft.client.OldMCPatcher.ReflectionHelper.*;
 
 public class Main extends Frame {
     private static Launcher launcher;
     public static String assetsDir;
+    public static boolean registerTexture = false;
 
     public static void main(String[] args) {
         System.out.println("OldMCPatcher 1.1.1 https://github.com/kusaanko/OldMCPatcher/releases");
+        try {
+            Main.class.getClassLoader().loadClass("cpw.mods.fml.common.ITickHandler");
+            registerTexture = true;
+            new Thread(() -> {
+                AtomicBoolean run = new AtomicBoolean(true);
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    run.set(false);
+                }));
+                while (run.get()) {
+                    try {
+                        Class fmlRelauncher = Main.class.getClassLoader().loadClass("cpw.mods.fml.relauncher.FMLRelauncher");
+                        Method instance = getDeclaredMethod(fmlRelauncher, "instance");
+                        Field loaderField = getDeclaredField(fmlRelauncher, "classLoader");
+                        Object fmlRelauncherInstance = waitAndInvoke(instance, null);
+                        URLClassLoader loader = (URLClassLoader) waitAndGet(loaderField, fmlRelauncherInstance);
+                        loader.loadClass("com.google.common.collect.Queues");
+                        try {
+                            Class sideClass = loader.loadClass("cpw.mods.fml.common.Side");
+                            Method registerTickHandler = loader.loadClass("cpw.mods.fml.common.registry.TickRegistry").getMethod("registerTickHandler", loader.loadClass("cpw.mods.fml.common.ITickHandler"), sideClass);
+                            Enum sideClient = null;
+                            for(Object enu : sideClass.getEnumConstants()) {
+                                if(enu.toString().equals("CLIENT")) sideClient = (Enum) enu;
+                            }
+                            defineClass(loader, "net.minecraft.client.OldMCPatcher.OldMCPatcherTickEvent", "/net/minecraft/client/OldMCPatcher/OldMCPatcherTickEvent.class");
+                            if(sideClient!=null) {
+                                registerTickHandler.invoke(null,
+                                        loader.loadClass(OldMCPatcherTickEvent.class.getName()).newInstance(),
+                                        sideClient);
+                            }
+                        }catch (ClassNotFoundException ignore){}
+                        catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IOException | InstantiationException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    } catch (ClassNotFoundException ignore){}
+                    catch(NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        } catch (ClassNotFoundException ignore) {
+            try {
+                defineClass(Main.class.getClassLoader(), "cpw.mods.fml.common.ITickHandler", "net/minecraft/client/OldMCPatcher/ITickHandler.class");
+            } catch (NoSuchMethodException | IOException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if (arg.equals("--assetsDir")) {
