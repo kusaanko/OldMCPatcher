@@ -21,7 +21,12 @@ public class ReflectionHelper {
 
     public static Object waitAndInvoke(Method method, Object obj, Object... param) throws InvocationTargetException, IllegalAccessException {
         Object result;
-        while((result = method.invoke(obj, param))==null) {}
+        while((result = method.invoke(obj, param))==null) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }}
         return result;
     }
 
@@ -39,7 +44,13 @@ public class ReflectionHelper {
 
     public static Object waitAndGet(Field field, Object obj) throws IllegalAccessException {
         Object result;
-        while((result = field.get(obj))==null) {}
+        while((result = field.get(obj))==null) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         return result;
     }
 
