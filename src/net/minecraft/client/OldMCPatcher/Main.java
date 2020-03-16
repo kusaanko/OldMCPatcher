@@ -142,20 +142,16 @@ public class Main extends Frame {
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent var1) {
-                new Thread() {
-                    @Override
-                    public void run() {
-                        super.run();
-                        try {
-                            Thread.sleep(30000L);
-                        } catch (InterruptedException var2) {
-                            var2.printStackTrace();
-                        }
-
-                        System.out.println("FORCING EXIT!");
-                        System.exit(0);
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(30000L);
+                    } catch (InterruptedException var2) {
+                        var2.printStackTrace();
                     }
-                }.start();
+
+                    System.out.println("FORCING EXIT!");
+                    System.exit(0);
+                }).start();
                 launcher.stop();
                 launcher.destroy();
 
