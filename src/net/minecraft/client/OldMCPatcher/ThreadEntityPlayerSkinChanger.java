@@ -4,7 +4,6 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -13,10 +12,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
+import static net.minecraft.client.OldMCPatcher.ReflectionHelper.*;
+
 public class ThreadEntityPlayerSkinChanger extends Thread{
     public Object minecraft;
     private boolean run;
-    private Field theWorldField;
+    private Field fieldInMc;
     private ArrayList<String> loaded;
     private HashMap<String, String> uuidMap;
 
@@ -38,19 +39,30 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
     public void run() {
         try {
             ArrayList<Field> mcFields = getAllDeclaredFields(this.minecraft.getClass());
+            URLClassLoader loader = (URLClassLoader) getClass().getClassLoader();
+            Method addURL = getDeclaredMethod(URLClassLoader.class, "addURL", URL.class);
             while (run) {
                 //playersList
                 for (Field fi : mcFields) {
                     try {
                         fi.setAccessible(true);
-                        Object theWorld;
-                        if(theWorldField==null) theWorld = fi.get(this.minecraft);
-                        else theWorld = theWorldField.get(this.minecraft);
-                        if(theWorld!=null) for (Field fie : getAllDeclaredFields(fi.getType())) {
+                        Object objInMc;
+                        if (fieldInMc == null) objInMc = fi.get(this.minecraft);
+                        else objInMc = fieldInMc.get(this.minecraft);
+                        if (Main.registerTexture == null) {
+                            if (objInMc != null && !objInMc.getClass().getName().contains("."))
+                                for (Method method : objInMc.getClass().getMethods()) {
+                                    if (method.getReturnType() == int.class && method.getParameterTypes().length == 1 && method.getParameterTypes()[0] == String.class) {
+                                        Main.registerTexture = method;
+                                        Main.renderEngine = objInMc;
+                                    }
+                                }
+                        }
+                        if (objInMc != null) for (Field fie : getAllDeclaredFields(fi.getType())) {
                             fie.setAccessible(true);
-                            if(fie.getType()==List.class) {
+                            if (fie.getType() == List.class) {
                                 try {
-                                    Object playersList = fie.get(theWorld);
+                                    Object playersList = fie.get(objInMc);
                                     if (playersList == null) continue;
                                     List<Object> playerList = new ArrayList<>();
                                     playerList.addAll((List) playersList);
@@ -59,7 +71,7 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                         for (Object player : playerList) {
                                             if (player != null) {
                                                 try {
-                                                    if(player.getClass().getSuperclass()!=null&&player.getClass().getSuperclass().getSuperclass()!=null) {
+                                                    if (player.getClass().getSuperclass() != null && player.getClass().getSuperclass().getSuperclass() != null) {
                                                         ArrayList<Field> fields = getAllDeclaredFields(player.getClass());
                                                         boolean isPlayer = false;
                                                         Field skinField = null;
@@ -70,13 +82,13 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                 if (url != null && url.equals("/mob/char.png")) {
                                                                     skinField = fiel;
                                                                     isPlayer = true;
-                                                                    if(theWorldField==null) {
-                                                                        theWorldField = fi;
+                                                                    if (fieldInMc == null) {
+                                                                        fieldInMc = fi;
                                                                     }
                                                                 }
                                                             }
                                                         }
-                                                        if(isPlayer) for (Field fiel : fields) {
+                                                        if (isPlayer) for (Field fiel : fields) {
                                                             String userName = null;
                                                             if (fiel.getType() == String.class) {
                                                                 fiel.setAccessible(true);
@@ -86,9 +98,9 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                     userName = data;
                                                                 }
                                                             }
-                                                            if(userName!=null) {
+                                                            if (userName != null) {
                                                                 String uuid;
-                                                                if((uuid = uuidMap.get(userName))==null) {
+                                                                if ((uuid = uuidMap.get(userName)) == null) {
                                                                     uuid = get("https://api.mojang.com/users/profiles/minecraft/" + userName);
                                                                     Matcher matcher = Pattern.compile("\"id\":\"([^\"]*)").matcher(uuid);
                                                                     if (matcher.find()) {
@@ -96,7 +108,7 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                     }
                                                                     uuidMap.put(userName, uuid);
                                                                 }
-                                                                if(!this.loaded.contains(uuid)) {
+                                                                if (!this.loaded.contains(uuid)) {
                                                                     System.out.println("Downloading skin of " + uuid);
                                                                     String profile = get("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid);
                                                                     if (profile != null) {
@@ -113,14 +125,16 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                         }
                                                                     }
                                                                     if (new File("resources/skin/" + uuid + ".zip").exists()) {
-                                                                        URLClassLoader loader = (URLClassLoader) getClass().getClassLoader();
-                                                                        Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-                                                                        addURL.setAccessible(true);
                                                                         addURL.invoke(loader, new File("resources/skin/" + uuid + ".zip").toURI().toURL());
+                                                                        if (Main.needRegisterTexture) {
+                                                                            addURL.invoke(Main.registerTexture.getDeclaringClass().getClassLoader(), new File("resources/skin/" + uuid + ".zip").toURI().toURL());
+                                                                            Main.loadTexture.add("/mob/" + uuid + ".png");
+                                                                        }
                                                                         this.loaded.add(uuid);
                                                                     }
                                                                 }
-                                                                System.out.println("Setting skin of " + userName+"("+uuid+")");
+                                                                Thread.sleep(200);
+                                                                System.out.println("Setting skin of " + userName + "(" + uuid + ")");
                                                                 skinField.set(player, "/mob/" + uuid + ".png");
                                                             }
                                                         }
@@ -128,8 +142,8 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                 } catch (NullPointerException ignore) {}
                                             }
                                         }
-                                    }catch (ConcurrentModificationException ignore) {}
-                                }catch (IllegalArgumentException ignore) {}
+                                    } catch (ConcurrentModificationException ignore) {}
+                                } catch (IllegalArgumentException ignore) {}
                             }
                         }
                     } catch (IllegalAccessException e) {
