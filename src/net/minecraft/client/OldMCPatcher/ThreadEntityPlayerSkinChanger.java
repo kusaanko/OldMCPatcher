@@ -131,7 +131,7 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                         addURL.invoke(loader, new File("resources/skin/" + uuid + ".zip").toURI().toURL());
                                                                         if (Main.needRegisterTexture) {
                                                                             addURL.invoke(Main.registerTexture.getDeclaringClass().getClassLoader(), new File("resources/skin/" + uuid + ".zip").toURI().toURL());
-                                                                            Main.loadTexture.add("/mob/" + uuid + ".png");
+                                                                            Main.loadTexture = "/mob/" + uuid + ".png";
                                                                         }
                                                                         this.loaded.add(uuid);
                                                                     }

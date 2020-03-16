@@ -5,13 +5,13 @@ import cpw.mods.fml.common.ITickHandler;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.EnumSet;
 
 public class OldMCPatcherTickEvent implements ITickHandler {
     private Field loadTexture;
     private Field registerTexture;
     private Field renderEngine;
+    private byte count;
 
     public OldMCPatcherTickEvent(Class mainClass) {
         try {
@@ -25,19 +25,23 @@ public class OldMCPatcherTickEvent implements ITickHandler {
 
     @Override
     public void tickStart(EnumSet enumSet, Object... object) {
-        try {
-            ArrayList<String> list = (ArrayList) loadTexture.get(null);
-            if(list.size()>0) {
-                try {
-                    ((Method)registerTexture.get(null)).invoke(renderEngine.get(null), list.get(0));
-                    System.out.println("Register texture "+list.get(0));
-                    list.remove(0);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
+        count++;
+        if(count == 2) {
+            count = 0;
+            try {
+                String name = (String) loadTexture.get(null);
+                if (name != null) {
+                    try {
+                        ((Method) registerTexture.get(null)).invoke(renderEngine.get(null), name);
+                        System.out.println("Register texture " + name);
+                        loadTexture.set(null, null);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
                 }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
             }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
         }
     }
 
@@ -50,7 +54,7 @@ public class OldMCPatcherTickEvent implements ITickHandler {
     public EnumSet ticks() {
         try {
             for(Object enu : getClass().getClassLoader().loadClass("cpw.mods.fml.common.TickType").getEnumConstants()) {
-                if(enu.toString().equals("CLIENT")) {
+                if(enu.toString().equals("WORLD")) {
                     return EnumSet.of((Enum) enu);
                 }
             }
