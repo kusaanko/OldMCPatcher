@@ -33,7 +33,7 @@ public class OldMCPatcherTickEvent implements ITickHandler {
                 if (name != null) {
                     try {
                         ((Method) registerTexture.get(null)).invoke(renderEngine.get(null), name);
-                        System.out.println("Register texture " + name);
+                        System.out.println("[OldMCPatcher] Register texture " + name);
                         loadTexture.set(null, null);
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();

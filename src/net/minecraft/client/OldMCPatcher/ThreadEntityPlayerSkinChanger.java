@@ -112,7 +112,7 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                     uuidMap.put(userName, uuid);
                                                                 }
                                                                 if (!this.loaded.contains(uuid)) {
-                                                                    System.out.println("Downloading skin of " + uuid);
+                                                                    System.out.println("[OldMCPatcher] Downloading skin of " + uuid);
                                                                     String profile = get("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid);
                                                                     if (profile != null) {
                                                                         Matcher matcher = Pattern.compile("\"value\":\"([^\"]*)").matcher(profile);
@@ -141,7 +141,7 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                         }
                                                                     }
                                                                 }
-                                                                System.out.println("Setting skin of " + userName + "(" + uuid + ")");
+                                                                System.out.println("[OldMCPatcher] Setting skin of " + userName + "(" + uuid + ")");
                                                                 skinField.set(player, "/mob/" + uuid + ".png");
                                                             }
                                                         }
