@@ -54,7 +54,7 @@ public class OldMCPatcherTickEvent implements ITickHandler {
     public EnumSet ticks() {
         try {
             for(Object enu : getClass().getClassLoader().loadClass("cpw.mods.fml.common.TickType").getEnumConstants()) {
-                if(enu.toString().equals("WORLD")) {
+                if(enu.toString().equals("CLIENT")) {
                     return EnumSet.of((Enum) enu);
                 }
             }
