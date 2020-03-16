@@ -31,6 +31,12 @@ public class ReflectionHelper {
         return field;
     }
 
+    public static Field getField(Class clazz, String name) throws NoSuchFieldException {
+        Field field = clazz.getField(name);
+        field.setAccessible(true);
+        return field;
+    }
+
     public static Object waitAndGet(Field field, Object obj) throws IllegalAccessException {
         Object result;
         while((result = field.get(obj))==null) {}
