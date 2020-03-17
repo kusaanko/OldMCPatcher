@@ -34,7 +34,7 @@ public class Main extends Frame {
     public static Method registerTexture;
 
     public static void main(String[] args) {
-        System.out.println("OldMCPatcher 1.1.2 https://github.com/kusaanko/OldMCPatcher/releases");
+        System.out.println("OldMCPatcher 1.1.3 https://github.com/kusaanko/OldMCPatcher/releases");
         try {
             Main.class.getClassLoader().loadClass("cpw.mods.fml.common.ITickHandler");
             new Thread(() -> {
