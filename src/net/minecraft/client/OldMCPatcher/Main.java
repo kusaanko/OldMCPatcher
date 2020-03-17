@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -44,10 +45,15 @@ public class Main extends Frame {
                 while (run.get()) {
                     try {
                         Class fmlRelauncher = Main.class.getClassLoader().loadClass("cpw.mods.fml.relauncher.FMLRelauncher");
-                        Method instance = getDeclaredMethod(fmlRelauncher, "instance");
+                        Field instance = getDeclaredField(fmlRelauncher, "INSTANCE");
                         Field loaderField = getDeclaredField(fmlRelauncher, "classLoader");
-                        Object fmlRelauncherInstance = waitAndInvoke(instance, null);
+                        Object fmlRelauncherInstance = waitAndGet(instance, null);
                         URLClassLoader loader = (URLClassLoader) waitAndGet(loaderField, fmlRelauncherInstance);
+                        Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+                        addURL.setAccessible(true);
+                        for(File f : new File("lib/").listFiles()) {
+                            addURL.invoke(loader, f.toURI().toURL());
+                        }
                         loader.loadClass("com.google.common.collect.Queues");
                         try {
                             Class sideClass = loader.loadClass("cpw.mods.fml.common.Side");
@@ -70,7 +76,7 @@ public class Main extends Frame {
                         }
                         break;
                     } catch (ClassNotFoundException ignore){}
-                    catch(NoSuchFieldException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    catch(NoSuchFieldException | IllegalAccessException | NoSuchMethodException | MalformedURLException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
                     try {
