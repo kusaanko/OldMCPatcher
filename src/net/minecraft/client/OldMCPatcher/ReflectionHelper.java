@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ReflectionHelper {
     public static Method getDeclaredMethod(Class clazz, String name, Class... param) throws NoSuchMethodException {
@@ -69,5 +71,13 @@ public class ReflectionHelper {
         stream.close();
         defineClass(classLoader, className, baos.toByteArray());
         baos.close();
+    }
+
+    public static ArrayList<Field> getAllDeclaredFields(Class clazz) {
+        ArrayList<Field> list = new ArrayList<>(Arrays.asList(clazz.getDeclaredFields()));
+        if(clazz.getSuperclass()!=null) {
+            list.addAll(getAllDeclaredFields(clazz.getSuperclass()));
+        }
+        return list;
     }
 }
