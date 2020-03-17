@@ -7,13 +7,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,7 +33,7 @@ public class Main extends Frame {
     public static Method registerTexture;
 
     public static void main(String[] args) {
-        System.out.println("OldMCPatcher 1.1.1 https://github.com/kusaanko/OldMCPatcher/releases");
+        System.out.println("OldMCPatcher 1.1.2 https://github.com/kusaanko/OldMCPatcher/releases");
         try {
             Main.class.getClassLoader().loadClass("cpw.mods.fml.common.ITickHandler");
             new Thread(() -> {
@@ -130,15 +132,35 @@ public class Main extends Frame {
         this.setLocationRelativeTo(null);
         this.setVisible(true);
         this.setTitle("Minecraft");
-        try {
-            File icon = new File(assetsDir, "icons/icon_32x32.png");
-            if(!icon.exists()) {
-                icon = new File(assetsDir.replace("pre-1.6", "legacy"), "icons/icon_32x32.png");
+        new Thread(() -> {
+            try {
+                File icon = new File(assetsDir, "icons/icon_32x32.png");
+                if(!icon.exists()) {
+                    icon = new File(assetsDir.replace("pre-1.6", "legacy"), "icons/icon_32x32.png");
+                    if(!icon.exists()) {
+                        Files.createDirectories(icon.getParentFile().toPath());
+                        URL url = new URL("http://resources.download.minecraft.net/92/92750c5f93c312ba9ab413d546f32190c56d6f1f");
+                        HttpURLConnection http = (HttpURLConnection)url.openConnection();
+                        http.setRequestMethod("GET");
+                        http.connect();
+
+                        InputStream inputStream = http.getInputStream();
+                        OutputStream stream = Files.newOutputStream(icon.toPath());
+
+                        int len;
+                        byte[] bytes = new byte[4096];
+                        while((len = inputStream.read(bytes, 0, bytes.length)) > 0) {
+                            stream.write(bytes, 0, len);
+                        }
+                        inputStream.close();
+                        stream.close();
+                    }
+                }
+                this.setIconImage(ImageIO.read(icon));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            this.setIconImage(ImageIO.read(icon));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        }).start();
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent var1) {
