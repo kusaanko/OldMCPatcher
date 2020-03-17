@@ -52,7 +52,7 @@ public class Main extends Frame {
                         Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
                         addURL.setAccessible(true);
                         for(File f : new File("lib/").listFiles()) {
-                            addURL.invoke(loader, f.toURI().toURL());
+                            if(f.getName().endsWith(".jar")) addURL.invoke(loader, f.toURI().toURL());
                         }
                         loader.loadClass("com.google.common.collect.Queues");
                         try {
