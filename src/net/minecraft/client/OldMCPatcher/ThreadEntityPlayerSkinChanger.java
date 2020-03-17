@@ -218,12 +218,4 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
 
         append.close();
     }
-
-    private ArrayList<Field> getAllDeclaredFields(Class clazz) {
-        ArrayList<Field> list = new ArrayList<>(Arrays.asList(clazz.getDeclaredFields()));
-        if(clazz.getSuperclass()!=null) {
-            list.addAll(getAllDeclaredFields(clazz.getSuperclass()));
-        }
-        return list;
-    }
 }
