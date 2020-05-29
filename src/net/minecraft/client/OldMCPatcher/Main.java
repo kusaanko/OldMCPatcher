@@ -44,7 +44,7 @@ public class Main extends Frame {
                 }));
                 while (run.get()) {
                     try {
-                        Class fmlRelauncher = Main.class.getClassLoader().loadClass("cpw.mods.fml.relauncher.FMLRelauncher");
+                        Class<?> fmlRelauncher = Main.class.getClassLoader().loadClass("cpw.mods.fml.relauncher.FMLRelauncher");
                         Field instance = getDeclaredField(fmlRelauncher, "INSTANCE");
                         Field loaderField = getDeclaredField(fmlRelauncher, "classLoader");
                         Object fmlRelauncherInstance = waitAndGet(instance, null);
@@ -56,7 +56,7 @@ public class Main extends Frame {
                         }
                         loader.loadClass("com.google.common.collect.Queues");
                         try {
-                            Class sideClass = loader.loadClass("cpw.mods.fml.common.Side");
+                            Class<?> sideClass = loader.loadClass("cpw.mods.fml.common.Side");
                             Method registerTickHandler = loader.loadClass("cpw.mods.fml.common.registry.TickRegistry").getMethod("registerTickHandler", loader.loadClass("cpw.mods.fml.common.ITickHandler"), sideClass);
                             Enum sideClient = null;
                             for(Object enu : sideClass.getEnumConstants()) {
