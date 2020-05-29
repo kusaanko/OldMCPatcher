@@ -74,8 +74,9 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                         for (Object player : playerList) {
                                             if (player != null) {
                                                 try {
-                                                    if (player.getClass().getSuperclass() != null && player.getClass().getSuperclass().getSuperclass() != null) {
-                                                        ArrayList<Field> fields = getAllDeclaredFields(player.getClass());
+                                                    Class<?> superclass = player.getClass();
+                                                    while((superclass = superclass.getSuperclass()) != null) {
+                                                        ArrayList<Field> fields = getAllDeclaredFields(superclass);
                                                         boolean isPlayer = false;
                                                         Field skinField = null;
                                                         for (Field fiel : fields) {
@@ -100,6 +101,12 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                         && !data.startsWith("http://skins.minecraft.net/Minecraft")) {
                                                                     userName = data;
                                                                 }
+                                                                if (data != null && data.startsWith("http://skins.minecraft.net/Minecraft")) {
+                                                                    fiel.set(player, "");
+                                                                }
+                                                                if (data != null && data.startsWith("http://s3.amazonaws.com/Minecraft")) {
+                                                                    fiel.set(player, "");
+                                                                }
                                                             }
                                                             if (userName != null) {
                                                                 String uuid;
@@ -115,10 +122,10 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                     System.out.println("[OldMCPatcher] Downloading skin of " + uuid);
                                                                     String profile = get("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid);
                                                                     if (profile != null) {
-                                                                        Matcher matcher = Pattern.compile("\"value\":\"([^\"]*)").matcher(profile);
+                                                                        Matcher matcher = Pattern.compile("\"value\"[^:]*:[^\"]*\"([^\"]*)").matcher(profile);
                                                                         if (matcher.find()) {
                                                                             String textureData = new String(Base64.getDecoder().decode(matcher.group(1)));
-                                                                            matcher = Pattern.compile("\"url\":\"([^\"]*)").matcher(textureData);
+                                                                            matcher = Pattern.compile("\"url\"[^:]*:[^\"]*\"([^\"]*)").matcher(textureData);
                                                                             if (matcher.find()) {
                                                                                 String textureUrl = matcher.group(1);
                                                                                 File out = new File("resources/skin/" + uuid + ".zip");
@@ -134,11 +141,15 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                             Main.loadTexture = "/mob/" + uuid + ".png";
                                                                         }
                                                                         this.loaded.add(uuid);
-                                                                        while(Main.loadTexture!=null) {
+                                                                        while (Main.loadTexture != null) {
                                                                             try {
                                                                                 Thread.sleep(10);
-                                                                            }catch (Exception ignore) {}
+                                                                            } catch (Exception ignore) {
+                                                                            }
                                                                         }
+                                                                    }else {
+                                                                        System.out.println("[OldMCPatcher] Failed to download skin file of " + uuid);
+                                                                        break;
                                                                     }
                                                                 }
                                                                 System.out.println("[OldMCPatcher] Setting skin of " + userName + "(" + uuid + ")");
