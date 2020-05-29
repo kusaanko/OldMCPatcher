@@ -34,7 +34,7 @@ public class Main extends Frame {
     public static Method registerTexture;
 
     public static void main(String[] args) {
-        System.out.println("OldMCPatcher 1.1.3 https://github.com/kusaanko/OldMCPatcher/releases");
+        System.out.println("OldMCPatcher 1.1.4 https://github.com/kusaanko/OldMCPatcher/releases");
         try {
             Main.class.getClassLoader().loadClass("cpw.mods.fml.common.ITickHandler");
             new Thread(() -> {
@@ -69,6 +69,7 @@ public class Main extends Frame {
                                         loader.loadClass(OldMCPatcherTickEvent.class.getName()).getConstructor(Class.class).newInstance(Main.class),
                                         sideClient);
                                 needRegisterTexture = true;
+                                run.set(false);
                             }
                         }catch (ClassNotFoundException ignore){}
                         catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IOException | InstantiationException e) {
@@ -87,6 +88,7 @@ public class Main extends Frame {
                 }
             }).start();
         } catch (ClassNotFoundException ignore) {
+            System.out.println("[OldMCPatcher] this version is not 1.5.2");
             try {
                 defineClass(Main.class.getClassLoader(), "cpw.mods.fml.common.ITickHandler", "/net/minecraft/client/OldMCPatcher/ITickHandler.bytecode");
             } catch (NoSuchMethodException | IOException | IllegalAccessException | InvocationTargetException e) {
