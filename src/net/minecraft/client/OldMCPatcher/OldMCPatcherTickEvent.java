@@ -13,7 +13,7 @@ public class OldMCPatcherTickEvent implements ITickHandler {
     private Field renderEngine;
     private byte count;
 
-    public OldMCPatcherTickEvent(Class mainClass) {
+    public OldMCPatcherTickEvent(Class<?> mainClass) {
         try {
             loadTexture = ReflectionHelper.getField(mainClass, "loadTexture");
             registerTexture = ReflectionHelper.getField(mainClass, "registerTexture");

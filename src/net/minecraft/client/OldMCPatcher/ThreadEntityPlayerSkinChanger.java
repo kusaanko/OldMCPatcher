@@ -19,8 +19,8 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
     public Object minecraft;
     private boolean run;
     private Field fieldInMc;
-    private ArrayList<String> loaded;
-    private HashMap<String, String> uuidMap;
+    private final ArrayList<String> loaded;
+    private final HashMap<String, String> uuidMap;
 
     public ThreadEntityPlayerSkinChanger(Object mc) {
         this.run = true;
@@ -67,8 +67,7 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                 try {
                                     Object playersList = fie.get(objInMc);
                                     if (playersList == null) continue;
-                                    List<Object> playerList = new ArrayList<>();
-                                    playerList.addAll((List) playersList);
+                                    List<Object> playerList = new ArrayList<>((List<?>) playersList);
                                     //skinUrl
                                     try {
                                         for (Object player : playerList) {
@@ -112,11 +111,15 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                 String uuid;
                                                                 if ((uuid = uuidMap.get(userName)) == null) {
                                                                     uuid = get("https://api.mojang.com/users/profiles/minecraft/" + userName);
-                                                                    Matcher matcher = Pattern.compile("\"id\":\"([^\"]*)").matcher(uuid);
-                                                                    if (matcher.find()) {
-                                                                        uuid = matcher.group(1);
+                                                                    if(uuid != null) {
+                                                                        Matcher matcher = Pattern.compile("\"id\":\"([^\"]*)").matcher(uuid);
+                                                                        if (matcher.find()) {
+                                                                            uuid = matcher.group(1);
+                                                                        }
+                                                                        uuidMap.put(userName, uuid);
+                                                                    }else {
+                                                                        break;
                                                                     }
-                                                                    uuidMap.put(userName, uuid);
                                                                 }
                                                                 if (!this.loaded.contains(uuid)) {
                                                                     System.out.println("[OldMCPatcher] Downloading skin of " + uuid);
