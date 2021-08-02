@@ -36,7 +36,7 @@ public class Main extends Frame {
     public static int height = 480;
 
     public static void main(String[] args) {
-        System.out.println("OldMCPatcher 1.1.4 https://github.com/kusaanko/OldMCPatcher/releases");
+        System.out.println("OldMCPatcher 1.1.5 https://github.com/kusaanko/OldMCPatcher/releases");
         try {
             Main.class.getClassLoader().loadClass("cpw.mods.fml.common.ITickHandler");
             new Thread(() -> {
