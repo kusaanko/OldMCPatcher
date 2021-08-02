@@ -32,6 +32,8 @@ public class Main extends Frame {
     public static String loadTexture;
     public static Object renderEngine;
     public static Method registerTexture;
+    public static int width = 854;
+    public static int height = 480;
 
     public static void main(String[] args) {
         System.out.println("OldMCPatcher 1.1.4 https://github.com/kusaanko/OldMCPatcher/releases");
@@ -100,6 +102,12 @@ public class Main extends Frame {
             if (arg.equals("--assetsDir")) {
                 assetsDir = args[i + 1];
             }
+            if (arg.equals("--width")) {
+                width = Integer.parseInt(args[i + 1]);
+            }
+            if (arg.equals("--height")) {
+                height = Integer.parseInt(args[i + 1]);
+            }
         }
         try{
             final File jarFile = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath());
@@ -133,7 +141,7 @@ public class Main extends Frame {
 
     public Main(String[] args) {
         launcher = new Launcher();
-        launcher.setPreferredSize(new Dimension(854, 480));
+        launcher.setPreferredSize(new Dimension(width, height));
         launcher.init(args);
         this.add(launcher);
         this.pack();
