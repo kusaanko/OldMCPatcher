@@ -142,6 +142,7 @@ public class Main extends Frame {
     public Main(String[] args) {
         launcher = new Launcher();
         launcher.setPreferredSize(new Dimension(width, height));
+        launcher.setSize(new Dimension(width, height));
         launcher.init(args);
         this.add(launcher);
         this.pack();
