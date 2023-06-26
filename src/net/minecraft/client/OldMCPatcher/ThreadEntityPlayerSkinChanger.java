@@ -112,7 +112,7 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                 if ((uuid = uuidMap.get(userName)) == null) {
                                                                     uuid = get("https://api.mojang.com/users/profiles/minecraft/" + userName);
                                                                     if(uuid != null) {
-                                                                        Matcher matcher = Pattern.compile("\"id\":\"([^\"]*)").matcher(uuid);
+                                                                        Matcher matcher = Pattern.compile("\"id\"[^:]*:[^\"]*\"([^\"]*)").matcher(uuid);
                                                                         if (matcher.find()) {
                                                                             uuid = matcher.group(1);
                                                                         }
@@ -122,7 +122,7 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                     }
                                                                 }
                                                                 if (!this.loaded.contains(uuid)) {
-                                                                    System.out.println("[OldMCPatcher] Downloading skin of " + uuid);
+                                                                    System.out.println("[OldMCPatcher] Downloading skin from https://sessionserver.mojang.com/session/minecraft/profile/" + uuid);
                                                                     String profile = get("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid);
                                                                     if (profile != null) {
                                                                         Matcher matcher = Pattern.compile("\"value\"[^:]*:[^\"]*\"([^\"]*)").matcher(profile);
@@ -132,7 +132,8 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                             if (matcher.find()) {
                                                                                 String textureUrl = matcher.group(1);
                                                                                 File out = new File("resources/skin/" + uuid + ".zip");
-                                                                                out.getParentFile().mkdirs();
+                                                                                if (out.getParentFile().mkdirs()) {
+                                                                                }
                                                                                 compress("mob/" + uuid + ".png", getByte(textureUrl), out);
                                                                             }
                                                                         }
