@@ -41,6 +41,23 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
     @Override
     public void run() {
         try {
+            String updateString = null;
+            {
+                System.out.println("[OldMCPatcher] Checking updates...");
+                String raw = get("https://raw.githubusercontent.com/kusaanko/OldMCPatcher/master/sum.json");
+                if (raw != null) {
+                    Matcher matcher = Pattern.compile("\"([^\"]*)\"").matcher(raw);
+                    if (matcher.find()) {
+                        String version = matcher.group(1);
+                        if (!version.equals(Main.version)) {
+                            updateString = "[OldMCPatcher] Update " + version + " available. Update from MCAddToJar or https://github.com/kusaanko/OldMCPatcher/releases";
+                            System.out.println(updateString);
+                        }
+                    }
+                } else {
+                    System.out.println("[OldMCPatcher] Can't get updates info");
+                }
+            }
             ArrayList<Field> mcFields = getAllDeclaredFields(this.minecraft.getClass());
             URLClassLoader loader = (URLClassLoader) getClass().getClassLoader();
             Method addURL = getDeclaredMethod(URLClassLoader.class, "addURL", URL.class);
@@ -88,6 +105,14 @@ public class ThreadEntityPlayerSkinChanger extends Thread{
                                                                     if (fieldInMc == null) {
                                                                         fieldInMc = fi;
                                                                     }
+                                                                }
+                                                            }
+                                                        }
+                                                        if (isPlayer && updateString != null) {
+                                                            for (Method method : superclass.getDeclaredMethods()) {
+                                                                if (method.getParameterTypes().length == 1 && method.getParameterTypes()[0] == String.class) {
+                                                                    method.setAccessible(true);
+                                                                    method.invoke(player, updateString);
                                                                 }
                                                             }
                                                         }
